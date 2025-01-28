@@ -1,0 +1,60 @@
+#include "mbed.h"
+#include "ArduinoJson.h"
+
+// Define USB Serial communication
+BufferedSerial serial_port(USBTX, USBRX, 115200);
+DigitalOut led(LED1);
+
+// Function to send JSON with a newline delimiter
+void send_json()
+{
+    StaticJsonDocument<200> doc;
+    doc["temperature"] = 25.3;
+    doc["led_status"] = led ? "on" : "off"; // LED state as "on" or "off"
+
+    char buffer[200];
+    size_t length = serializeJson(doc, buffer);
+
+    buffer[length] = '\n';  // Append newline to mark end of JSON
+    serial_port.write(buffer, length + 1); // Send with newline
+}
+
+// Function to read incoming serial data
+void read_serial()
+{
+    char received[100] = {0};
+    int len = serial_port.read(received, sizeof(received) - 1);
+
+    if (len > 0)
+    {
+        received[len] = '\0';  // Null-terminate
+        StaticJsonDocument<100> doc;
+        DeserializationError error = deserializeJson(doc, received);
+
+        if (!error)
+        {
+            if (doc["command"] == "toggle_led")
+            {
+                led = !led;  // Toggle LED
+                printf("LED Toggled: %s\n", led ? "ON" : "OFF");
+            }
+        }
+        else
+        {
+            printf("JSON Parse Error: %s\n", error.c_str()); // Debug error
+        }
+    }
+}
+
+int main()
+{
+    serial_port.set_blocking(false);
+    printf("Program Started...\n");
+
+    while (true)
+    {
+        send_json();   // Send temperature and LED status
+        read_serial(); // Listen for commands
+        ThisThread::sleep_for(1000ms);
+    }
+}
