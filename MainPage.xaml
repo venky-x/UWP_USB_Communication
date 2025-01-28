@@ -1,0 +1,15 @@
+﻿<Page
+    x:Class="UWP_USB_Communication.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UWP_USB_Communication"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Padding="20">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+            <TextBlock x:Name="TemperatureText" FontSize="20" Text="Temperature: -- °C"/>
+            <TextBlock x:Name="LedStatusText" FontSize="20" Text="LED Status: --"/>
+            <Button Content="Toggle LED" Click="ToggleLedButton_Click" FontSize="18" Width="200"/>
+        </StackPanel>
+    </Grid>
+</Page>
